@@ -1,0 +1,74 @@
+services:
+  app:
+    build:
+      context: ../appbase-backend
+      dockerfile: Dockerfile
+    container_name: appbase-app
+    env_file:
+      - ../appbase-backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../appbase-backend:/app
+    networks:
+      - appbase-net
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: appbase-db
+    environment:
+      POSTGRES_USER: appbase
+      POSTGRES_PASSWORD: appbase
+      POSTGRES_DB: appbase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - appbase-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appbase -d appbase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: appbase-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - appbase-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: appbase-mailpit
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    networks:
+      - appbase-net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  appbase-net:
+    driver: bridge
