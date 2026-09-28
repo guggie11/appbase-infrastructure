@@ -1,0 +1,54 @@
+services:
+  app:
+    build:
+      context: ../appbase-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../appbase-backend/.env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - appbase-net
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../appbase-frontend
+      dockerfile: ../appbase-infrastructure/Dockerfile.frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    networks:
+      - appbase-net
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: appbase
+      POSTGRES_USER: appbase
+      POSTGRES_PASSWORD: appbase
+    networks:
+      - appbase-net
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - appbase-net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  appbase-net:
+    driver: bridge

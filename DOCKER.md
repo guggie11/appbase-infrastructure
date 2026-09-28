@@ -39,3 +39,9 @@ REDIS_URL=redis://localhost:6379/0
 SMTP_HOST=localhost
 SMTP_PORT=1025
 ```
+
+## Production
+
+```bash
+docker compose -f docker-compose.prod.yml up -d
+```
