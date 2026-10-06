@@ -5,6 +5,17 @@ Semua perubahan penting pada Appbase dicatat di berkas ini.
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/),
 dan proyek ini memakai [Semantic Versioning](https://semver.org/lang/id/).
 
+## [1.3.1] — 2026-10-06
+
+### Diperbaiki
+
+- **Pemasangan baru berakhir tanpa peran sama sekali.** Urutan yang
+  didokumentasikan menjalankan aplikasi sebelum migrasi, sehingga seed saat
+  mulai gagal pada basis data kosong dan tidak pernah diulang. Akibatnya
+  `create_superadmin.py` berhenti dengan `role 'super-admin' not found`.
+  Kini tersedia opsi `--seed` yang menyemai peran dan permission bila belum
+  ada, dan README memakainya sebagai langkah baku.
+
 ## [1.3.0] — 2026-10-06
 
 Rilis ini menjadikan Appbase benar-benar bisa dipakai sebagai template: sampai
@@ -78,5 +89,6 @@ versi sebelumnya, hasil clone **tidak bisa dijalankan sampai selesai**.
 Rilis pertama: autentikasi JWT, RBAC, menu dinamis, audit log, notifikasi,
 undangan pengguna, OAuth/SSO, dan pengaturan tampilan aplikasi.
 
+[1.3.1]: https://github.com/guggie11/appbase-infrastructure/releases/tag/v1.3.1
 [1.3.0]: https://github.com/guggie11/appbase-infrastructure/releases/tag/v1.3.0
 [1.0.0]: https://github.com/guggie11/appbase-infrastructure/releases/tag/v1.0.0
