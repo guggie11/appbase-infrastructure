@@ -87,25 +87,30 @@ Appbase is a full-stack GitHub Template that provides everything you need to bui
 
 ```bash
 # 1. Clone all three repos into a shared workspace
+# Keep the folder names: the compose files reference these exact siblings.
 mkdir my-project && cd my-project
-git clone https://github.com/guggie11/appbase-infrastructure infrastructure
-git clone https://github.com/guggie11/appbase-backend backend
-git clone https://github.com/guggie11/appbase-frontend frontend
+git clone https://github.com/guggie11/appbase-infrastructure
+git clone https://github.com/guggie11/appbase-backend
+git clone https://github.com/guggie11/appbase-frontend
 
 # 2. Set up backend environment
-cp backend/.env.example backend/.env
-# Edit backend/.env with your values (DB, Redis, SMTP, SECRET_KEY)
+cp appbase-backend/.env.example appbase-backend/.env
+# Generate your own SECRET_KEY:
+#   python -c "import secrets; print(secrets.token_urlsafe(48))"
 
 # 3. Start the full stack
-cd infrastructure
+cd appbase-infrastructure
 make up
 
 # 4. Run database migrations
-docker exec appbase-app alembic upgrade head
+docker compose exec app uv run alembic upgrade head
 
 # 5. Create the first super admin
-docker exec -it appbase-app python scripts/create_superadmin.py
+#    A fresh install has no users at all, so this step is required.
+docker compose exec app uv run python scripts/create_superadmin.py \
+    --email you@example.com --password 'ChangeMe@Str0ng1' --name 'Admin'
 ```
+
 
 The API is now running at **http://localhost:8000** and the frontend at **http://localhost:5173** (dev) or **http://localhost:80** (production Docker).
 
@@ -170,16 +175,17 @@ sed -i 's/appbase/your-project/g' docker-compose.yml docker-compose.prod.yml
 ### 3. Configure environment
 
 ```bash
-cp backend/.env.example backend/.env
+cp appbase-backend/.env.example appbase-backend/.env
 # Set: DATABASE_URL, SECRET_KEY, REDIS_URL, SMTP_HOST, FRONTEND_URL, CORS_ORIGINS
 ```
 
 ### 4. Run migrations and seed data
 
 ```bash
-cd infrastructure && make up
-docker exec appbase-app alembic upgrade head
-docker exec -it appbase-app python scripts/create_superadmin.py
+cd appbase-infrastructure && make up
+docker compose exec app uv run alembic upgrade head
+docker compose exec app uv run python scripts/create_superadmin.py \
+    --email you@example.com --password 'ChangeMe@Str0ng1'
 ```
 
 ### 5. Versioning convention
@@ -230,17 +236,17 @@ Run infrastructure services only (DB, Redis, Mailpit), then run backend and fron
 
 ```bash
 # Terminal 1 — infra only
-cd infrastructure
+cd appbase-infrastructure
 make infra   # starts db + redis + mailpit only
 
 # Terminal 2 — backend
-cd backend
+cd appbase-backend
 uv sync
 uv run alembic upgrade head
 uv run fastapi dev src/app/main.py
 
 # Terminal 3 — frontend
-cd frontend
+cd appbase-frontend
 pnpm install
 pnpm dev
 ```
@@ -248,7 +254,7 @@ pnpm dev
 ### Production Docker Mode
 
 ```bash
-cd infrastructure
+cd appbase-infrastructure
 make up   # builds and starts all services including app + nginx
 ```
 
@@ -262,19 +268,19 @@ Access:
 
 **Backend:**
 ```bash
-cd backend
+cd appbase-backend
 uv run pytest tests/ -v
 ```
 
 **Frontend (unit):**
 ```bash
-cd frontend
+cd appbase-frontend
 pnpm test
 ```
 
 **Frontend (E2E):**
 ```bash
-cd frontend
+cd appbase-frontend
 pnpm test:e2e
 ```
 

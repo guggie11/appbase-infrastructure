@@ -2,7 +2,7 @@ services:
   app:
     build:
       context: ../appbase-backend
-      dockerfile: Dockerfile
+      dockerfile: ../appbase-infrastructure/Dockerfile.backend
     container_name: appbase-app
     env_file:
       - ../appbase-backend/.env
