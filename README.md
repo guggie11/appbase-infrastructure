@@ -107,7 +107,7 @@ docker compose exec app uv run alembic upgrade head
 
 # 5. Create the first super admin
 #    A fresh install has no users at all, so this step is required.
-docker compose exec app uv run python scripts/create_superadmin.py \
+docker compose exec app uv run python scripts/create_superadmin.py --seed \
     --email you@example.com --password 'ChangeMe@Str0ng1' --name 'Admin'
 ```
 
@@ -184,7 +184,7 @@ cp appbase-backend/.env.example appbase-backend/.env
 ```bash
 cd appbase-infrastructure && make up
 docker compose exec app uv run alembic upgrade head
-docker compose exec app uv run python scripts/create_superadmin.py \
+docker compose exec app uv run python scripts/create_superadmin.py --seed \
     --email you@example.com --password 'ChangeMe@Str0ng1'
 ```
 
