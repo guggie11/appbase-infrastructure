@@ -2,8 +2,7 @@ services:
   app:
     build:
       context: ../appbase-backend
-      dockerfile: Dockerfile
-    container_name: appbase-app
+      dockerfile: ../appbase-infrastructure/Dockerfile.backend
     env_file:
       - ../appbase-backend/.env
     ports:
@@ -21,7 +20,6 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: appbase-db
     environment:
       POSTGRES_USER: appbase
       POSTGRES_PASSWORD: appbase
@@ -41,7 +39,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: appbase-redis
     ports:
       - "6379:6379"
     volumes:
@@ -57,7 +54,6 @@ services:
 
   mailpit:
     image: axllent/mailpit:latest
-    container_name: appbase-mailpit
     ports:
       - "1025:1025"   # SMTP
       - "8025:8025"   # Web UI

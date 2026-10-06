@@ -2,10 +2,11 @@ services:
   app:
     build:
       context: ../appbase-backend
+      dockerfile: ../appbase-infrastructure/Dockerfile.backend
     ports:
       - "8000:8000"
     env_file:
-      - ../appbase-backend/.env
+      - ../appbase-backend/.env.prod
     depends_on:
       - db
       - redis
