@@ -5,6 +5,64 @@ Semua perubahan penting pada Appbase dicatat di berkas ini.
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/),
 dan proyek ini memakai [Semantic Versioning](https://semver.org/lang/id/).
 
+## [1.4.0] — 2026-10-27
+
+Dua tambahan yang mengubah Appbase dari aplikasi contoh menjadi template yang
+menghemat pekerjaan sehari-hari, bukan hanya penyiapan awal.
+
+### Ditambahkan
+
+- **Generator modul CRUD** — satu perintah menghasilkan modul utuh di backend
+  dan frontend:
+
+  ```
+  uv run python scripts/generate_module.py Product \
+      --fields "name:str,price:int,note:text,is_active:bool" \
+      --frontend ../appbase-frontend
+  ```
+
+  Menghasilkan model, schema, service, router, migrasi, test, permission CRUD,
+  entri menu, lalu di sisi frontend queries, halaman daftar, dan modal form.
+  Rute yang dihasilkan selalu dibungkus `PermissionRoute` — tanpa itu siapa pun
+  bisa membuka halaman dengan mengetik URL. Tersedia `--dry-run`, dan generator
+  menolak jalan bila berkas tujuan sudah ada.
+
+- **Category Management** — data referensi generik yang dirujuk fitur lain,
+  supaya proyek turunan berhenti menanam daftar status dan klasifikasi di kode.
+  Group adalah wadah bertema dengan kode yang dipakai fitur lain; Category
+  adalah item di dalamnya, bersarang sedalam apa pun.
+
+  Fitur lain cukup memanggil `GET /categories/by-group/{code}` — hanya item
+  aktif yang dikembalikan, jadi nilai yang sudah tidak boleh dipilih tidak
+  pernah sampai ke pemilih mana pun.
+
+  **Appbase tidak menyemai satu group pun.** Kosakata adalah milik proyek yang
+  memakai template.
+
+  Integritas referensi dijaga basis data: fitur menyimpan foreign key dengan
+  `ON DELETE RESTRICT`, sehingga menghapus nilai yang masih dirujuk ditolak
+  PostgreSQL — bukan oleh pemeriksaan di lapisan aplikasi yang bisa
+  ketinggalan ketika tabel baru ditambahkan. Jalur normalnya **deprecate**:
+  nilai hilang dari pemilih, alasannya wajib diisi, dan seluruh rujukan lama
+  tetap utuh.
+
+### Diperbaiki
+
+- **Foreign key tidak pernah ditegakkan saat pengujian.** SQLite mengabaikan
+  foreign key kecuali diminta, dan `PRAGMA foreign_keys` tidak pernah ada.
+  Artinya setiap `ON DELETE` di skema selama ini hanya hiasan: pengujian yang
+  menyatakan sebuah baris terlindungi akan lulus sementara basis data dengan
+  senang hati menghapusnya.
+
+- **Seed gagal diam-diam ketika beberapa pekerja menyala bersamaan.** Dua
+  proses server menyemai serempak; keduanya melihat slug belum ada, keduanya
+  menyisipkan, lalu transaksi yang kalah dibuang seluruhnya sehingga setiap
+  baris berikutnya dilewati tanpa pesan apa pun.
+
+- **Logo meleset saat sidebar dikecilkan** — baris brand memakai
+  `space-between`, sehingga ketika menyempit dan hanya berisi logo, logonya
+  terlempar ke tepi.
+
 ## [1.3.1] — 2026-10-06
 
 ### Diperbaiki
